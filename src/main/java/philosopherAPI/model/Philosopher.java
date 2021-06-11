@@ -15,15 +15,11 @@ public class Philosopher {
     private String name;
     private String title;
 
-    private Month birthMonth;
-    private Integer birthDay;
-    private Integer birthYear;
+    private DateOfBirth dateOfBirth;
     private String birthCountry;
     private String birthCity;
 
-    private Month deathMonth;
-    private Integer deathDay;
-    private Integer deathYear;
+    private DateOfDeath dateOfDeath;
     private String deathCountry;
     private String deathCity;
 
