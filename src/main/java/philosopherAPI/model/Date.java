@@ -11,8 +11,8 @@ import java.time.Month;
 @AllArgsConstructor
 @Getter
 @Setter
-public class DateOfBirth {
-    private Month birthMonth;
-    private Integer birthDay;
-    private Integer birthYear;
+public class Date {
+    private Month month;
+    private Integer day;
+    private Integer year;
 }

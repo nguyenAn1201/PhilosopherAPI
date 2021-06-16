@@ -6,8 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import philosopherAPI.model.DateOfBirth;
-import philosopherAPI.model.DateOfDeath;
+import philosopherAPI.model.Date;
 import philosopherAPI.model.Philosopher;
 
 import java.io.IOException;
@@ -35,18 +34,28 @@ public class PhilosopherScraper implements CommandLineRunner {
                 String title = doc.select(".topic-identifier").text();
                 String description = doc.select(".topic-paragraph").first().text();
 
-                DateOfBirth dob = scrapeDayOfBirth(doc);
-                DateOfDeath dod = scrapeDateOfDeath(doc);
+                Date dob = scrapeDayOfBirth(doc);
+                Date dod = scrapeDateOfDeath(doc);
 
                 List<String> notableWorks = doc.select("dl[data-label='notable works'] > dd > ul > li").eachText();
+//                List<NotableWork> notableWorks = notableWorks.stream().map(work -> {
+//                    NotableWork notableWork = new NotableWork();
+//                    notableWork.setUrl();
+//                    notableWork.setTitle();
+//                    return notableWorks;
+//                })
 
                 Philosopher newPhilosopher = new Philosopher();
                 newPhilosopher.setName(name);
                 newPhilosopher.setTitle(title);
                 newPhilosopher.setDescription(description);
-                newPhilosopher.setDateOfBirth(dob);
-                newPhilosopher.setDateOfDeath(dod);
-                newPhilosopher.setNotableWorks(notableWorks);
+                newPhilosopher.setBirthMonth(dob.getMonth());
+                newPhilosopher.setBirthDay(dob.getDay());
+                newPhilosopher.setBirthYear(dob.getYear());
+                newPhilosopher.setDeathMonth(dod.getMonth());
+                newPhilosopher.setDeathDay(dod.getDay());
+                newPhilosopher.setDeathYear(dod.getYear());
+                newPhilosopher.setNotableWorks(null);
 
                 return newPhilosopher;
             } catch (IOException e) {
@@ -56,35 +65,35 @@ public class PhilosopherScraper implements CommandLineRunner {
         }).collect(Collectors.toList());
     }
 
-    public DateOfBirth scrapeDayOfBirth(Document document) {
-        DateOfBirth dateOfBirth = new DateOfBirth();
+    public Date scrapeDayOfBirth(Document document) {
+        Date date = new Date();
 
         List<String> dob = Arrays.asList((document.select("dl[data-label='born'] > dd, dl[data-label='baptized'] > dd").text().split(" ")));
         if (dob.contains("BCE")) {
-            dateOfBirth.setBirthYear(Integer.parseInt(dob.get(dob.indexOf("BCE") - 1)));
+            date.setYear(Integer.parseInt(dob.get(dob.indexOf("BCE") - 1)));
         } else {
             if (Arrays.toString(Month.values()).contains(dob.get(0).toUpperCase())) {
-                dateOfBirth.setBirthMonth(Month.valueOf(dob.get(0).toUpperCase()));
-                dateOfBirth.setBirthDay(Integer.parseInt(dob.get(1).split(",")[0]));
-                dateOfBirth.setBirthYear(Integer.parseInt(dob.get(2)));
+                date.setMonth(Month.valueOf(dob.get(0).toUpperCase()));
+                date.setDay(Integer.parseInt(dob.get(1).split(",")[0]));
+                date.setYear(Integer.parseInt(dob.get(2)));
             } else {
-                dateOfBirth.setBirthYear(Integer.parseInt(dob.get(0)));
+                date.setYear(Integer.parseInt(dob.get(0)));
             }
         }
-        return dateOfBirth;
+        return date;
     }
 
-    public DateOfDeath scrapeDateOfDeath(Document document) {
-        DateOfDeath dateOfDeath = new DateOfDeath();
+    public Date scrapeDateOfDeath(Document document) {
+        Date dateOfDeath = new Date();
         List<String> dod = Arrays.asList(document.select("dl[data-label='died'] > dd").text().split(" "));
 
         if (dod.size() > 1) {
             if (dod.contains("BCE")) {
-                dateOfDeath.setDeathYear(Integer.parseInt(dod.get(dod.indexOf("BCE") -1)));
+                dateOfDeath.setYear(Integer.parseInt(dod.get(dod.indexOf("BCE") -1)));
             } else {
-                dateOfDeath.setDeathMonth(Month.valueOf(dod.get(0).toUpperCase()));
-                dateOfDeath.setDeathDay(Integer.parseInt(dod.get(1).split(",")[0]));
-                dateOfDeath.setDeathYear(Integer.parseInt(dod.get(2)));
+                dateOfDeath.setMonth(Month.valueOf(dod.get(0).toUpperCase()));
+                dateOfDeath.setDay(Integer.parseInt(dod.get(1).split(",")[0]));
+                dateOfDeath.setYear(Integer.parseInt(dod.get(2)));
             }
         }
 
